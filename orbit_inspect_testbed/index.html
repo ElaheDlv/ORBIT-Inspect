@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ORBIT-Inspect Interactive Testbed</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">ORBIT-Inspect testbed</p>
+        <h1>ORBIT-Inspect</h1>
+      </div>
+      <div class="topbar__metrics" aria-label="testbed summary">
+        <div><span id="pointCount">--</span><small>measured points</small></div>
+        <div><span>30</span><small>Mb/s background UL</small></div>
+        <div><span id="liveModeLabel">Replay</span><small>controller mode</small></div>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel control-panel" aria-label="cross-layer controls">
+        <div class="panel__header">
+          <h2>Control Surface</h2>
+          <button id="recoverBtn" class="primary-btn" type="button">Recover</button>
+        </div>
+
+        <label class="field">
+          <span>Conveyor speed</span>
+          <output id="speedOut">1.0 m/s</output>
+          <input id="speed" type="range" min="0" max="3" step="1" value="1">
+        </label>
+
+        <fieldset class="field">
+          <legend>Camera resolution</legend>
+          <div id="resolutionGroup" class="segmented" role="radiogroup"></div>
+        </fieldset>
+
+        <label class="field">
+          <span>UL PRB allocation</span>
+          <output id="prbOut">35%</output>
+          <input id="prb" type="range" min="0" max="9" step="1" value="3">
+        </label>
+
+        <label class="field">
+          <span>Edge CPU allocation</span>
+          <output id="cpuOut">4 cores</output>
+          <input id="cpu" type="range" min="0" max="7" step="1" value="3">
+        </label>
+
+        <div class="button-row">
+          <button class="scenario-btn" data-scenario="nominal" type="button">Nominal</button>
+          <button class="scenario-btn" data-scenario="stress" type="button">Stress</button>
+          <button class="scenario-btn" data-scenario="scarce" type="button">Scarce</button>
+        </div>
+
+        <div class="mode-toggle">
+          <label><input id="autoRecover" type="checkbox"> Auto-recover after changes</label>
+        </div>
+
+        <div class="live-box">
+          <div>
+            <span>Live testbed</span>
+            <strong id="liveStatus">checking backend</strong>
+          </div>
+          <button id="applyLive" type="button">Apply Live</button>
+          <div class="live-grid">
+            <label>Speed<input id="liveSpeed" type="number" min="0.1" max="3.0" step="0.1" value="1.0"></label>
+            <label>Resolution<input id="liveResolution" type="text" value="640x360" pattern="[0-9]+x[0-9]+"></label>
+            <label>UL PRB %<input id="livePrb" type="number" min="1" max="100" step="1" value="35"></label>
+            <label>CPU cores<input id="liveCpu" type="number" min="0.25" max="16" step="0.25" value="4"></label>
+          </div>
+          <div class="live-run">
+            <div><span>Online run</span><strong id="liveRunStatus">idle</strong></div>
+            <div><span>Isaac progress</span><strong id="liveIsaacProgress">waiting for Isaac</strong></div>
+            <div><span>Command acknowledgments</span><strong id="liveAckSummary">none yet</strong></div>
+            <div><span>Live actuator status</span><strong id="liveActuatorSummary">none yet</strong></div>
+            <div><span>Result CSV</span><strong id="liveResultPath">not created yet</strong></div>
+            <div><span>Online measurement</span><strong id="liveMeasurement">waiting for run</strong></div>
+            <div><span>Observed online config</span><strong id="liveObservedConfig">waiting for rows</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="factory-view" aria-label="factory testbed visualization">
+        <div class="factory-canvas">
+          <div class="cell cell--factory">
+            <span>Isaac Sim factory</span>
+            <strong>camera + conveyor</strong>
+          </div>
+          <div class="link link--radio"><span id="uploadLatency">-- ms</span></div>
+          <div class="cell cell--ran">
+            <span>OAI + FlexRIC</span>
+            <strong id="ranState">UL --%</strong>
+          </div>
+          <div class="link link--edge"><span id="inferenceLatency">-- ms</span></div>
+          <div class="cell cell--edge">
+            <span>YOLO edge service</span>
+            <strong id="edgeState">-- cores</strong>
+          </div>
+          <div id="part" class="part" aria-hidden="true"></div>
+          <div id="deadlineMarker" class="deadline-marker"><span>deadline</span></div>
+          <div id="deadlineStatus" class="deadline-status">--</div>
+        </div>
+      </section>
+
+      <section class="panel status-panel" aria-label="current operating point">
+        <div class="status-head">
+          <div>
+            <p class="eyebrow">Current operating point</p>
+            <h2 id="statusTitle">--</h2>
+          </div>
+          <span id="statusBadge" class="badge">--</span>
+        </div>
+
+        <div class="metric-grid">
+          <div><span id="cotRate">--</span><small>correct-on-time</small></div>
+          <div><span id="goodput">--</span><small>goodput parts/min</small></div>
+          <div><span id="p95Latency">--</span><small>p95 roundtrip</small></div>
+          <div><span id="resourceCost">--</span><small>resource cost</small></div>
+        </div>
+
+        <div class="latency-stack" aria-label="latency decomposition">
+          <div id="uploadBar" class="stack-segment stack-segment--upload"><span>upload</span></div>
+          <div id="edgeBar" class="stack-segment stack-segment--edge"><span>edge</span></div>
+          <div id="feedbackBar" class="stack-segment stack-segment--feedback"><span>feedback</span></div>
+        </div>
+
+        <p id="decisionText" class="decision-text"></p>
+      </section>
+
+      <section class="panel chart-panel">
+        <div class="panel__header">
+          <h2>Measured Feasibility Map</h2>
+          <select id="heatMetric" aria-label="heatmap metric">
+            <option value="correct_on_time_rate">Correct-on-time</option>
+            <option value="production_goodput">Goodput</option>
+            <option value="p95_roundtrip_ms">p95 latency</option>
+            <option value="resource_cost">Resource cost</option>
+          </select>
+        </div>
+        <canvas id="heatmap" width="720" height="420"></canvas>
+      </section>
+
+      <section class="panel chart-panel">
+        <div class="panel__header">
+          <h2>Adaptation Replay</h2>
+          <button id="playReplay" type="button">Play</button>
+        </div>
+        <canvas id="timeline" width="720" height="300"></canvas>
+      </section>
+
+      <section class="panel table-panel">
+        <div class="panel__header">
+          <h2>Controller Recommendation</h2>
+          <span id="recommendationMode">joint search</span>
+        </div>
+        <table>
+          <tbody>
+            <tr><th>Selected resolution</th><td id="recResolution">--</td></tr>
+            <tr><th>Selected UL PRB</th><td id="recPrb">--</td></tr>
+            <tr><th>Selected CPU</th><td id="recCpu">--</td></tr>
+            <tr><th>Expected outcome</th><td id="recOutcome">--</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <script src="app.js?v=20260724_result_path_cot_breakdown"></script>
+  </body>
+</html>

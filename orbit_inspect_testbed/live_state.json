@@ -1,0 +1,115 @@
+{
+  "speed": 1.0,
+  "resolution": "640x360",
+  "prb": 35,
+  "cpu": 4.0,
+  "apply_real": true,
+  "last_update": 1785073122.7532406,
+  "run_id": "live_1785073122",
+  "latency_csv_path": "/home/elahe/user/Co_design_codes/ORBIT-Inspect/orbit_inspect_testbed/live_results/latest/factory_latency_20260726_093842_live_1785073122.csv",
+  "run_status": "running",
+  "online_measurement": {
+    "status": "waiting_for_file",
+    "path": "/home/elahe/user/Co_design_codes/ORBIT-Inspect/orbit_inspect_testbed/live_results/latest/factory_latency_20260726_093842_live_1785073122.csv"
+  },
+  "actuator_results": [
+    {
+      "name": "edge_cpu",
+      "status": "applied",
+      "detail": "edge-dev; verified Docker CPU limit 4",
+      "command": [
+        "docker",
+        "update",
+        "--cpus",
+        "4.0",
+        "edge-dev"
+      ],
+      "timestamp": 1785073122.787362
+    },
+    {
+      "name": "application_stack",
+      "status": "restarted",
+      "detail": "runner-style edge/factory relays for live_1785073122; speed=1.0; cpu=4.0; [ORBIT-Inspect] Run ./orbit_inspect_testbed/check_live_stack.sh for full preflight.",
+      "command": [
+        "/home/elahe/user/Co_design_codes/ORBIT-Inspect/orbit_inspect_testbed/start_live_application_stack.sh"
+      ],
+      "timestamp": 1785073130.0441172
+    },
+    {
+      "name": "ul_prb",
+      "status": "started",
+      "detail": "started slice xApp with industrial UL PRB 35% background UL PRB 65% background offered load 30 Mb/s industrial=0xe124 background=0xaa8c policy=/home/elahe/user/Co_design_codes/ORBIT-Inspect/orbit_inspect_testbed/live_results/latest/orbit3c_slice_policy.json",
+      "command": [
+        "/home/elahe/user/ORBIT3C_OAI_DEV/oai_ran/openairinterface5g/openair2/E2AP/flexric/build/examples/xApp/c/slice/xapp_orbit3c_static_slice_ctrl"
+      ],
+      "timestamp": 1785073130.0450625
+    },
+    {
+      "name": "ros_control",
+      "status": "acknowledged",
+      "detail": "published {\"speed\": 1.0, \"resolution\": \"640x360\", \"prb\": 35, \"cpu\": 4.0, \"start_run\": true, \"run_id\": \"live_1785073122\", \"config_path\": \"/home/elahe/user/Co_design_codes/ORBIT-Inspect/orbit_inspect_testbed/live_results/latest/current_live_config.json\"}; subscribers=3; ack_publishers=4; acks=2",
+      "command": [],
+      "timestamp": 1785073130.6989288,
+      "acks": [
+        {
+          "component": "isaac",
+          "status": "applied",
+          "received_at": 1785073130.2871094,
+          "running": false,
+          "command": {
+            "speed": 1.0,
+            "resolution": "640x360",
+            "prb": 35,
+            "cpu": 4.0,
+            "start_run": true,
+            "run_id": "live_1785073122",
+            "config_path": "/home/elahe/user/Co_design_codes/ORBIT-Inspect/orbit_inspect_testbed/live_results/latest/current_live_config.json"
+          },
+          "run_id": "live_1785073122",
+          "config_path": "/home/elahe/user/Co_design_codes/ORBIT-Inspect/orbit_inspect_testbed/live_results/latest/current_live_config.json",
+          "speed": 1.0,
+          "resolution": "640x360",
+          "render_product_node": "/World/ActionGraph_01/isaac_create_render_product",
+          "run_request": "queued"
+        },
+        {
+          "component": "factory_relay",
+          "status": "applied",
+          "received_at": 1785073130.541094,
+          "pid": 573222,
+          "command": {
+            "speed": 1.0,
+            "resolution": "640x360",
+            "prb": 35,
+            "cpu": 4.0,
+            "start_run": true,
+            "run_id": "live_1785073122",
+            "config_path": "/home/elahe/user/Co_design_codes/ORBIT-Inspect/orbit_inspect_testbed/live_results/latest/current_live_config.json"
+          },
+          "config_path": "/home/elahe/user/Co_design_codes/ORBIT-Inspect/orbit_inspect_testbed/live_results/latest/current_live_config.json",
+          "resolution": "640x360"
+        }
+      ],
+      "control_subscribers": 3,
+      "ack_publishers": 4,
+      "ros_domain_id": "",
+      "rmw_implementation": ""
+    }
+  ],
+  "isaac_status": {
+    "component": "isaac",
+    "phase": "waiting",
+    "running": false,
+    "run_id": "",
+    "speed": 1.0,
+    "spawned": 0,
+    "planned": 0,
+    "spawn_index": 0,
+    "active": 0,
+    "completed": 0,
+    "replays": 0,
+    "timestamp": 1785073129.321222,
+    "status_age_sec": 0.1582779884338379,
+    "publishers": 3
+  }
+}

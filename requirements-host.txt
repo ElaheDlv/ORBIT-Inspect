@@ -1,0 +1,4 @@
+# Host-side Python helpers. ROS nodes still need /usr/bin/python3 with ROS 2 Jazzy.
+pandas
+numpy
+requests

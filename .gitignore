@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+*.pyo
+*.log
+
+orbit_inspect_testbed/live_results/*
+!orbit_inspect_testbed/live_results/.gitkeep
+!orbit_inspect_testbed/live_results/latest/
+orbit_inspect_testbed/live_results/latest/*
+!orbit_inspect_testbed/live_results/latest/.gitkeep
+orbit_inspect_testbed/**/__pycache__/
+automated_experiments/**/__pycache__/
+
+.DS_Store
+.vscode/
+.idea/
+
+# Uncomment for a public artifact if the model is distributed separately.
+# best_n.pt
