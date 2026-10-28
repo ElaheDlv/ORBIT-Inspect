@@ -11,7 +11,6 @@
   <a href="https://youtu.be/S_SA_UToFLU">Watch the demo</a> ·
   <a href="https://arxiv.org/abs/2608.13372">Read the paper</a> ·
   <a href="#try-the-dashboard">Try the dashboard</a> ·
-  <a href="docs/DEMO.md">Presentation guide</a> ·
   <a href="orbit_inspect_testbed/SETUP_0_TO_100.md">Full setup</a>
 </p>
 
@@ -40,6 +39,60 @@ reaches the sorting point. The example holds end-to-end latency constant to
 illustrate how a faster process can turn an on-time decision into a late one;
 actual latency varies with the operating configuration. Timing ends at decision
 return, before physical sorting is completed.
+
+## Dataset: GC10-DET
+
+ORBIT-Inspect uses **GC10-DET** metallic surface defect imagery for its inspection
+task. The dataset was introduced in
+[*Deep Metallic Surface Defect Detection: The New Benchmark and Detection Network*](https://doi.org/10.3390/s20061562).
+Credit for the source dataset belongs to its original authors.
+
+[Dataset repository and download instructions](https://github.com/lvxiaoming2019/GC10-DET-Metallic-Surface-Defect-Datasets) ·
+[Dataset paper](https://doi.org/10.3390/s20061562)
+
+The Isaac runtime uses the following ten class names: `punching_hole`,
+`welding_line`, `crescent_gap`, `water_spot`, `oil_spot`, `silk_spot`, `inclusion`,
+`rolled_pit`, `crease`, and `waist_folding`.
+
+GC10-DET source images and images captured from the Isaac Sim scene represent
+different stages of the inspection workflow. Dataset examples illustrate defect
+appearance; application performance is measured through the complete inspection
+loop described in our paper.
+
+### Example defect images
+
+Selected GC10-DET examples with ground-truth bounding-box annotations. Click
+an image to inspect it at full resolution. These examples illustrate the visual
+task and do not establish detection accuracy.
+
+| Crease | Crescent gap |
+| --- | --- |
+| [![Crease example with box overlays](docs/assets/gc10-det/crease_1.jpg)](docs/assets/gc10-det/crease_1.jpg) | [![Crescent gap example with box overlay](docs/assets/gc10-det/crescent_gap_1.jpg)](docs/assets/gc10-det/crescent_gap_1.jpg) |
+| **Inclusion** | **Oil spot** |
+| [![Inclusion example with box overlays](docs/assets/gc10-det/inclusion_1.jpg)](docs/assets/gc10-det/inclusion_1.jpg) | [![Oil spot example with box overlay](docs/assets/gc10-det/oil_spot_2.jpg)](docs/assets/gc10-det/oil_spot_2.jpg) |
+| **Punching hole** | **Rolled pit** |
+| [![Punching hole example with box overlay](docs/assets/gc10-det/punching_hole_1.jpg)](docs/assets/gc10-det/punching_hole_1.jpg) | [![Rolled pit example with box overlay](docs/assets/gc10-det/rolled_pit_1.jpg)](docs/assets/gc10-det/rolled_pit_1.jpg) |
+
+Source imagery: [GC10-DET](https://github.com/lvxiaoming2019/GC10-DET-Metallic-Surface-Defect-Datasets).
+Please cite the [original dataset paper](https://doi.org/10.3390/s20061562) when
+using GC10-DET in research. See the [sample provenance note](docs/assets/gc10-det/README.md).
+
+### YOLO detection examples
+
+Example detector outputs from the inspection pipeline. **Red boxes** show YOLO
+predictions; each label contains the predicted defect class and its confidence
+score. **Green boxes** in the dataset gallery above show ground-truth annotations.
+
+| Crescent gap · confidence 0.71 | Crescent gap · confidence 0.69 |
+| --- | --- |
+| [![YOLO crescent-gap prediction with confidence 0.71](docs/assets/yolo-detections/crescent-gap-071.png)](docs/assets/yolo-detections/crescent-gap-071.png) | [![YOLO crescent-gap prediction with confidence 0.69](docs/assets/yolo-detections/crescent-gap-069.png)](docs/assets/yolo-detections/crescent-gap-069.png) |
+| **Oil spot · confidence 0.43** | **Crease · confidence 0.55** |
+| [![YOLO oil-spot prediction with confidence 0.43](docs/assets/yolo-detections/oil-spot-043.png)](docs/assets/yolo-detections/oil-spot-043.png) | [![YOLO crease prediction with confidence 0.55](docs/assets/yolo-detections/crease-055.png)](docs/assets/yolo-detections/crease-055.png) |
+
+Confidence scores describe individual predictions; they are not measured accuracy
+or evidence that a decision met its deadline. These selected examples illustrate
+detector behavior. See the paper for the evaluation of the complete inspection
+loop and the [image provenance note](docs/assets/yolo-detections/README.md) for source details.
 
 ## Try the dashboard
 
@@ -93,8 +146,7 @@ source /opt/ros/jazzy/setup.bash
 
 Open **[the live dashboard](http://127.0.0.1:8766/orbit_inspect_testbed/index.html)**.
 See the [operator guide](orbit_inspect_testbed/README.md) for run acknowledgments,
-measurement fields, and recovery instructions, or use the
-[presentation guide](docs/DEMO.md) for a short walkthrough.
+measurement fields, and recovery instructions.
 
 ## Repository map
 
@@ -102,7 +154,6 @@ measurement fields, and recovery instructions, or use the
 | --- | --- |
 | [`orbit_inspect_testbed/`](orbit_inspect_testbed/) | Dashboard, backend, launchers, preflight checks, and runtime scripts |
 | [`orbit_inspect_testbed/SETUP_0_TO_100.md`](orbit_inspect_testbed/SETUP_0_TO_100.md) | External dependencies and full testbed setup |
-| [`docs/DEMO.md`](docs/DEMO.md) | Demo preparation and presentation sequence |
 | [`automated_experiments/`](automated_experiments/) | Recovery helper and measured replay summary |
 | [`edge_relay_oai_dev.py`](edge_relay_oai_dev.py) | Edge-side YOLO TCP service |
 | [`ue_forwarder_oai_dev.py`](ue_forwarder_oai_dev.py) | UE tunnel forwarder |
