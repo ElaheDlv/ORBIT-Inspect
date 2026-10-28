@@ -553,6 +553,16 @@ th {
 .research-panel {
   grid-column: 1 / -1;
   min-width: 0;
+  scroll-margin-top: 140px;
+}
+
+.research-shortcut {
+  display: inline-block;
+  margin-top: 10px;
+  color: var(--green);
+  font-size: 14px;
+  font-weight: 700;
+  text-underline-offset: 3px;
 }
 
 .research-grid {

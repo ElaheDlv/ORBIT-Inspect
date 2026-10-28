@@ -71,3 +71,25 @@ orbit_inspect_testbed/live_results/latest/factory_latency.csv
 ```
 
 The dashboard also shows the active result CSV path under `Result CSV`.
+
+## Demo Video
+
+Watch the ORBIT-Inspect demonstration on YouTube:
+
+[![Watch the ORBIT-Inspect demo on YouTube](https://img.youtube.com/vi/S_SA_UToFLU/hqdefault.jpg)](https://youtu.be/S_SA_UToFLU)
+
+[Watch the demo video](https://youtu.be/S_SA_UToFLU).
+
+## Research Paper
+
+**Process-Aware Cross-Layer Adaptation for O-RAN-Enabled Industrial Systems**
+
+Elahe Delavari, Junaid Farooq, M. Majid Butt, and Quanyan Zhu.
+
+The paper describes PACE, a framework that coordinates sensing, radio, and
+edge-compute resources around physical process deadlines. ORBIT-Inspect provides
+the factory-inspection testbed used in the work, combining a physics-based digital
+twin, programmable 5G O-RAN, and edge visual inference.
+
+[Read the paper on arXiv](https://arxiv.org/abs/2608.13372) ·
+[Download the PDF](https://arxiv.org/pdf/2608.13372)
