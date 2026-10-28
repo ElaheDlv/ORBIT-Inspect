@@ -30,19 +30,16 @@ programmable 5G O-RAN, and edge visual inference.
 | Nominal, Stress, and Scarce scenarios | Correct-on-time rate, production goodput, and latency |
 | Controller recommendations and adaptation replay | Operating points selected from the measured design space |
 
-## System at a glance
+## How the inspection loop works
 
-```mermaid
-flowchart LR
-    A["Isaac Sim factory<br/>Camera + conveyor"] --> B["Factory relay<br/>UE forwarder"]
-    B --> C["5G O-RAN<br/>OAI UE · gNB · core"]
-    C --> D["Edge service<br/>YOLO inference"]
-    D -->|Inspection result| B
-    B -->|Decision| A
-    E["Dashboard + backend"] -.->|Speed + resolution| A
-    E -.->|UL PRB via FlexRIC| C
-    E -.->|CPU quota| D
-```
+![Factory inspection loop: sense, communicate over 5G, compute at the edge, and return a decision before the process deadline. The same example latency misses the faster-process deadline but meets the slower-process deadline.](docs/assets/inspection-loop.png)
+
+Conveyor speed determines the time available for inspection. Sensing,
+communication, and edge inference must deliver a correct decision before the part
+reaches the sorting point. The example holds end-to-end latency constant to
+illustrate how a faster process can turn an on-time decision into a late one;
+actual latency varies with the operating configuration. Timing ends at decision
+return, before physical sorting is completed.
 
 ## Try the dashboard
 
