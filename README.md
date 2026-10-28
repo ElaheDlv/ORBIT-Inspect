@@ -1,23 +1,83 @@
-# ORBIT-Inspect Live Demo
+<p align="center">
+  <img src="docs/assets/orbit-inspect-banner.svg" alt="ORBIT-Inspect: sensing, 5G O-RAN, and edge intelligence for process-aware industrial inspection" width="100%">
+</p>
 
-This repository contains the ORBIT-Inspect interactive live-demo artifact for
-the ORBIT-Inspect testbed. It packages the dashboard, live backend, Isaac runtime script,
-factory/UE/edge relays, measured replay summary, and recovery/preflight scripts.
+<p align="center">
+  <strong>An interactive research testbed for process-aware industrial inspection.</strong><br>
+  Explore how sensing, wireless resources, and edge computing affect correct, on-time decisions.
+</p>
 
-The artifact is not a replacement for Isaac Sim, OpenAirInterface, FlexRIC, or
-the OAI core. Those systems must be installed separately and configured as
-described in:
+<p align="center">
+  <a href="https://youtu.be/S_SA_UToFLU">Watch the demo</a> ·
+  <a href="https://arxiv.org/abs/2608.13372">Read the paper</a> ·
+  <a href="#try-the-dashboard">Try the dashboard</a> ·
+  <a href="docs/DEMO.md">Presentation guide</a> ·
+  <a href="orbit_inspect_testbed/SETUP_0_TO_100.md">Full setup</a>
+</p>
 
-```text
-orbit_inspect_testbed/SETUP_0_TO_100.md
+## Why ORBIT-Inspect?
+
+A correct inspection result only helps if it arrives before the part reaches the
+sorting point. Increasing conveyor speed shortens that window; increasing camera
+resolution changes both the wireless payload and the inference workload.
+ORBIT-Inspect makes these dependencies visible through an Isaac Sim digital twin,
+programmable 5G O-RAN, and edge visual inference.
+
+| Explore | Observe |
+| --- | --- |
+| Conveyor speed and camera resolution | Changes in process deadlines and sensing workloads |
+| Uplink physical resource block (PRB) allocation and edge CPU quota | Effects of communication and compute resources on the inspection loop |
+| Nominal, Stress, and Scarce scenarios | Correct-on-time rate, production goodput, and latency |
+| Controller recommendations and adaptation replay | Operating points selected from the measured design space |
+
+## System at a glance
+
+```mermaid
+flowchart LR
+    A["Isaac Sim factory<br/>Camera + conveyor"] --> B["Factory relay<br/>UE forwarder"]
+    B --> C["5G O-RAN<br/>OAI UE · gNB · core"]
+    C --> D["Edge service<br/>YOLO inference"]
+    D -->|Inspection result| B
+    B -->|Decision| A
+    E["Dashboard + backend"] -.->|Speed + resolution| A
+    E -.->|UL PRB via FlexRIC| C
+    E -.->|CPU quota| D
 ```
 
-## Quick Start On The Configured Demo Machine
+## Try the dashboard
+
+**Measured replay** is the quickest way to explore the interface. It uses the
+bundled experiment summary and requires Python 3 and a browser.
 
 From the repository root:
 
 ```bash
-cd /path/to/ORBIT-Inspect
+python3 -m http.server 8765 --bind 127.0.0.1
+```
+
+Open **[the replay dashboard](http://127.0.0.1:8765/orbit_inspect_testbed/index.html)**.
+Select **Nominal**, **Stress**, or **Scarce**, explore the feasibility map, then
+click **Play** under Adaptation Replay.
+
+The controller mode should read **Measured replay**. If it reads **Fallback**, the
+measured CSV failed to load and the displayed values come from a fallback model;
+do not present those values as experimental results. Live-control functions require
+the backend and configured external testbed.
+
+| Mode | Behavior | Requirements |
+| --- | --- | --- |
+| Measured replay | Explores bundled measured configurations without actuating the testbed | Python 3, browser |
+| Live testbed | Applies settings to the running stack and records a new inspection run | Isaac Sim, ROS 2 Jazzy, OAI, FlexRIC, Docker, configured relays |
+
+## Run the live testbed
+
+These commands assume the external stack is installed and configured. For
+installation and machine-specific configuration, follow the
+[complete setup guide](orbit_inspect_testbed/SETUP_0_TO_100.md).
+
+In a terminal at the repository root:
+
+```bash
 source /opt/ros/jazzy/setup.bash
 sudo -v
 ORBIT3C_RECOVER_CORE=1 ./orbit_inspect_testbed/reset_measured_channel_stack.sh
@@ -25,71 +85,90 @@ ORBIT3C_RECOVER_CORE=1 ./orbit_inspect_testbed/reset_measured_channel_stack.sh
 ./orbit_inspect_testbed/start_live_backend.sh
 ```
 
-In Isaac Sim, run:
-
-```text
-orbit_inspect_testbed/runtime_scripts/distance_based_spawning_orbit_inspect_live.py
-```
-
-Then verify:
+In Isaac Sim, run
+[`distance_based_spawning_orbit_inspect_live.py`](orbit_inspect_testbed/runtime_scripts/distance_based_spawning_orbit_inspect_live.py).
+Then verify the stack in a second terminal:
 
 ```bash
 source /opt/ros/jazzy/setup.bash
 ./orbit_inspect_testbed/check_live_stack.sh
 ```
 
-Open:
+Open **[the live dashboard](http://127.0.0.1:8766/orbit_inspect_testbed/index.html)**.
+See the [operator guide](orbit_inspect_testbed/README.md) for run acknowledgments,
+measurement fields, and recovery instructions, or use the
+[presentation guide](docs/DEMO.md) for a short walkthrough.
+
+## Repository map
+
+| Path | Purpose |
+| --- | --- |
+| [`orbit_inspect_testbed/`](orbit_inspect_testbed/) | Dashboard, backend, launchers, preflight checks, and runtime scripts |
+| [`orbit_inspect_testbed/SETUP_0_TO_100.md`](orbit_inspect_testbed/SETUP_0_TO_100.md) | External dependencies and full testbed setup |
+| [`docs/DEMO.md`](docs/DEMO.md) | Demo preparation and presentation sequence |
+| [`automated_experiments/`](automated_experiments/) | Recovery helper and measured replay summary |
+| [`edge_relay_oai_dev.py`](edge_relay_oai_dev.py) | Edge-side YOLO TCP service |
+| [`ue_forwarder_oai_dev.py`](ue_forwarder_oai_dev.py) | UE tunnel forwarder |
+| [`best_n.pt`](best_n.pt) | Model weights used by the demo |
+| [`isaac_sim.usd`](isaac_sim.usd) | Bundled Isaac scene asset |
+
+## Measurements and reproducibility
+
+Replay reads
+[`summary_current_grid.csv`](automated_experiments/plots_grid_1056_analysis_cleaned/summary_current_grid.csv).
+The bundled summary currently contains **960 configuration rows**. The directory
+name is retained from the experiment workflow; it is not the row count.
+
+Live runs can use settings outside this measured grid. Treat their outputs as new
+measurements rather than interchangeable reproductions of the paper results.
+The dashboard reports correct-on-time rate, production goodput, p95 roundtrip
+latency, and resource cost.
+
+Generated live CSV and log files are ignored by Git and written under
+`orbit_inspect_testbed/live_results/latest/`. After **Apply Live**, the dashboard's
+**Result CSV** field identifies the output. Typical files include:
 
 ```text
-http://127.0.0.1:8766/orbit_inspect_testbed/index.html
+factory_latency_YYYYMMDD_HHMMSS_live_RUNID.csv
+factory_latency.csv
 ```
 
-## Included Runtime Files
+## Demo video
 
-```text
-orbit_inspect_testbed/           dashboard, backend, launchers, Isaac scripts
-edge_relay_oai_dev.py                  edge-side YOLO TCP service
-ue_forwarder_oai_dev.py                UE tunnel forwarder
-best_n.pt                              YOLO model used by the demo
-automated_experiments/scripts/         OAI recovery helper used by ORBIT-Inspect
-automated_experiments/plots_grid_1056_analysis_cleaned/summary_current_grid.csv
-```
+<p align="center">
+  <a href="https://youtu.be/S_SA_UToFLU">
+    <img src="https://img.youtube.com/vi/S_SA_UToFLU/hqdefault.jpg" alt="Watch the ORBIT-Inspect demonstration on YouTube" width="640">
+  </a>
+</p>
 
-Live outputs are written under:
+<p align="center"><a href="https://youtu.be/S_SA_UToFLU"><strong>▶ Watch the ORBIT-Inspect demo</strong></a></p>
 
-```text
-orbit_inspect_testbed/live_results/latest/
-```
-
-The directory is present in the repo through `.gitkeep` files, but generated
-CSV/log outputs are intentionally ignored by git. After each `Apply Live`, look
-for:
-
-```text
-orbit_inspect_testbed/live_results/latest/factory_latency_YYYYMMDD_HHMMSS_live_RUNID.csv
-orbit_inspect_testbed/live_results/latest/factory_latency.csv
-```
-
-The dashboard also shows the active result CSV path under `Result CSV`.
-
-## Demo Video
-
-Watch the ORBIT-Inspect demonstration on YouTube:
-
-[![Watch the ORBIT-Inspect demo on YouTube](https://img.youtube.com/vi/S_SA_UToFLU/hqdefault.jpg)](https://youtu.be/S_SA_UToFLU)
-
-[Watch the demo video](https://youtu.be/S_SA_UToFLU).
-
-## Research Paper
+## Research paper
 
 **Process-Aware Cross-Layer Adaptation for O-RAN-Enabled Industrial Systems**
 
 Elahe Delavari, Junaid Farooq, M. Majid Butt, and Quanyan Zhu.
 
-The paper describes PACE, a framework that coordinates sensing, radio, and
-edge-compute resources around physical process deadlines. ORBIT-Inspect provides
-the factory-inspection testbed used in the work, combining a physics-based digital
-twin, programmable 5G O-RAN, and edge visual inference.
+The paper presents PACE, a framework for coordinating sensing, radio, and edge
+computing around physical process deadlines, evaluated through a factory-inspection
+case study.
 
-[Read the paper on arXiv](https://arxiv.org/abs/2608.13372) ·
-[Download the PDF](https://arxiv.org/pdf/2608.13372)
+[Read on arXiv](https://arxiv.org/abs/2608.13372) ·
+[Download PDF](https://arxiv.org/pdf/2608.13372)
+
+<details>
+<summary>Cite this work (BibTeX)</summary>
+
+```bibtex
+@misc{delavari2026processaware,
+  title         = {Process-Aware Cross-Layer Adaptation for O-RAN-Enabled Industrial Systems},
+  author        = {Elahe Delavari and Junaid Farooq and M. Majid Butt and Quanyan Zhu},
+  year          = {2026},
+  eprint        = {2608.13372},
+  archivePrefix = {arXiv},
+  primaryClass  = {eess.SY},
+  url           = {https://arxiv.org/abs/2608.13372}
+}
+```
+
+</details>

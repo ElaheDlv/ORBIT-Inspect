@@ -429,7 +429,8 @@ Do not reuse old RNTIs after OAI recovery or UE reconnect.
 
 ## Measured Replay Only
 
-For viewing the measured 1056-point design space without live control:
+For viewing the bundled measured design space without live control (currently
+960 configuration rows):
 
 ```bash
 cd /path/to/ORBIT-Inspect
